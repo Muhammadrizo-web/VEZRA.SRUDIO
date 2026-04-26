@@ -82,3 +82,23 @@
 .animate-fadeUp {
   animation: fadeUp 0.7s ease-out;
 }
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 22s linear infinite;
+  will-change: transform;
+}
+
+/* ❗ безопасный hover — без поломки анимации */
+.marquee-hover:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+:root {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
