@@ -1,154 +1,131 @@
-import { useState } from 'react';
-import { Send, CheckCircle } from 'lucide-react';
-import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
+import { Mail, Phone, MapPin, ArrowUpRight, Send } from 'lucide-react';
 
-export default function CTA() {
-  const { ref, isVisible } = useIntersectionObserver(0.2);
-  const [form, setForm] = useState({ name: '', contact: '', message: '' });
-  const [sent, setSent] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-    setSent(true);
-  };
-
+export default function ContactSection() {
   return (
     <section
-      id="contact"
-      ref={ref as React.RefObject<HTMLElement>}
-      className="relative py-28 bg-[#0a0a0a] overflow-hidden"
+      className="relative min-h-[75vh] overflow-hidden px-6 pt-32 pb-20 text-white lg:px-12"
+      style={{
+        backgroundImage: "url('/bcfoto1.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
     >
-      {/* Glow effects */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-orange-500/8 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 bg-black/30" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_10%,rgba(52,211,153,0.16),transparent_34%)]" />
 
-      {/* Noise texture */}
-      <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-        }}
-      />
+      {/* <div className="pointer-events-none absolute left-1/2 top-[20%] -translate-x-1/2 select-none text-[120px] font-black uppercase leading-none tracking-[-0.08em] text-white/[0.05] md:text-[180px]">
+        CONTACT
+      </div> */}
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-          {/* Left side - Logo & text */}
-          <div
-            className={`transition-all duration-700 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
-          >
-            <img
-              src="/Logo.png"
-              alt="Studio Logo"
-              className="h-16 w-auto object-contain mb-10 opacity-90"
-            />
-            <span className="text-xs font-semibold tracking-[0.3em] uppercase text-amber-500 mb-4 block">
-              Начнём?
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-6 leading-tight">
-              Расскажите<br />о своём проекте
-            </h2>
-            <p className="text-white/50 text-sm leading-relaxed max-w-sm">
-              Мы свяжемся с вами в течение одного рабочего дня, чтобы обсудить детали и подготовить предложение.
-            </p>
-
-            <div className="mt-10 flex flex-col gap-4">
-              {[
-                { label: 'Email', value: 'hello@studio.ru' },
-                { label: 'Телефон', value: '+7 (999) 123-45-67' },
-                { label: 'Telegram', value: '@studio_design' },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center gap-3">
-                  <span className="text-white/30 text-xs w-16">{item.label}</span>
-                  <span className="text-white/70 text-sm font-medium">{item.value}</span>
-                </div>
-              ))}
+      <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 gap-14 lg:grid-cols-[0.92fr_1.08fr] lg:items-stretch">
+        <div className="flex h-full flex-col justify-between animate-[fadeLeft_.85s_cubic-bezier(.22,1,.36,1)_both]">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-5 py-2 text-sm backdrop-blur-xl">
+              <Send size={14} />
+              Contact
             </div>
+
+            <h2 className="mt-7 text-4xl font-semibold leading-[1.02] tracking-[-0.055em] md:text-6xl">
+              Get in touch
+            </h2>
+
+            <p className="mt-5 max-w-md text-sm leading-relaxed text-white/65">
+              Have a question or want to discuss your project? Send us a message and we will contact you shortly.
+            </p>
           </div>
 
-          {/* Right side - Form */}
-          <div
-            className={`transition-all duration-700 delay-200 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
-          >
-            {sent ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <CheckCircle size={48} className="text-amber-400 mb-6" />
-                <h3 className="text-2xl font-bold text-white mb-3">Заявка отправлена!</h3>
-                <p className="text-white/50 text-sm">
-                  Мы свяжемся с вами в течение рабочего дня.
-                </p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                  <label className="block text-xs font-medium text-white/40 mb-2 tracking-wide">
-                    Имя
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="Как вас зовут?"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-amber-500/60 focus:bg-white/8 transition-all duration-300"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-white/40 mb-2 tracking-wide">
-                    Телефон / Email
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={form.contact}
-                    onChange={(e) => setForm({ ...form, contact: e.target.value })}
-                    placeholder="+7 (999) 000-00-00 или email"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-amber-500/60 focus:bg-white/8 transition-all duration-300"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-white/40 mb-2 tracking-wide">
-                    О проекте
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={form.message}
-                    onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    placeholder="Кратко расскажите о вашем проекте и задачах..."
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-amber-500/60 focus:bg-white/8 transition-all duration-300 resize-none"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full flex items-center justify-center gap-3 py-4 bg-amber-500 hover:bg-amber-400 text-[#0a0a0a] rounded-xl font-semibold text-sm tracking-wide transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-amber-500/30 disabled:opacity-60 disabled:scale-100"
-                >
-                  {loading ? (
-                    <div className="w-4 h-4 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />
-                  ) : (
-                    <Send size={16} />
-                  )}
-                  {loading ? 'Отправляем...' : 'Отправить заявку'}
-                </button>
-
-                <p className="text-center text-white/25 text-xs">
-                  Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности
-                </p>
-              </form>
-            )}
+          <div className="mt-10 space-y-4">
+            <InfoCard icon={Mail} title="Email us" value="vezrastudio.uz@gmail.com" />
+            <InfoCard icon={Phone} title="Call us" value="+998 98 189 11 17" />
+            <InfoCard icon={MapPin} title="Our location" value="Tashkent, Uzbekistan" />
           </div>
         </div>
+
+        <div className="animate-[fadeRight_.9s_cubic-bezier(.22,1,.36,1)_both]">
+          <form className="flex h-full flex-col rounded-[28px] border border-white/15 bg-white/[0.06] p-4 backdrop-blur-2xl shadow-[0_28px_80px_rgba(0,0,0,.34)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_40px_100px_rgba(0,0,0,.44)]">
+            <div className="space-y-4">
+              <Field placeholder="Name" />
+              <Field placeholder="Email" />
+
+              <textarea
+                placeholder="Message"
+                className="h-[220px] w-full resize-none rounded-[22px] border border-white/10 bg-black/20 px-6 py-5 text-sm text-white outline-none transition-all duration-300 placeholder:text-white/35 focus:border-emerald-300/30 focus:bg-black/28"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="mt-4 h-16 w-full rounded-[22px] bg-white text-sm font-semibold text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_14px_35px_rgba(255,255,255,.14)]"
+            >
+              Submit
+            </button>
+          </form>
+        </div>
       </div>
+
+      <style>{`
+        @keyframes fadeLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-24px);
+            filter: blur(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+            filter: blur(0);
+          }
+        }
+
+        @keyframes fadeRight {
+          from {
+            opacity: 0;
+            transform: translateX(24px);
+            filter: blur(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+            filter: blur(0);
+          }
+        }
+      `}</style>
     </section>
+  );
+}
+
+function Field({ placeholder }: { placeholder: string }) {
+  return (
+    <input
+      placeholder={placeholder}
+      className="h-14 w-full rounded-[22px] border border-white/10 bg-black/20 px-6 text-sm text-white outline-none transition-all duration-300 placeholder:text-white/35 focus:border-emerald-300/30 focus:bg-black/28"
+    />
+  );
+}
+
+function InfoCard({
+  icon: Icon,
+  title,
+  value,
+}: {
+  icon: any;
+  title: string;
+  value: string;
+}) {
+  return (
+    <div className="group flex items-center gap-4 rounded-[22px] border border-white/12 bg-white/[0.055] p-4 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.08] hover:shadow-[0_18px_45px_rgba(0,0,0,.22)]">
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-black/20">
+        <Icon size={20} strokeWidth={1.8} />
+      </div>
+
+      <div className="flex-1">
+        <div className="text-sm font-semibold">{title}</div>
+        <div className="mt-1 text-sm text-white/50">{value}</div>
+      </div>
+
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/70 transition-all duration-300 group-hover:rotate-45 group-hover:bg-white group-hover:text-black">
+        <ArrowUpRight size={17} />
+      </div>
+    </div>
   );
 }

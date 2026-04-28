@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [active, setActive] = useState('about');
-
   const [indicator, setIndicator] = useState({ left: 0, width: 0 });
+  const [isLight, setIsLight] = useState(true);
 
   const containerRef = useRef(null);
 
@@ -16,6 +16,7 @@ export default function Navbar() {
     { name: 'Контакт', id: 'contact' },
   ];
 
+  // SCROLL
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
 
@@ -26,10 +27,10 @@ export default function Navbar() {
       });
     }
 
-    setActive(id);
     setMenuOpen(false);
   };
 
+  // INDICATOR
   const updateIndicator = (id) => {
     const activeEl = document.querySelector(`[data-id="${id}"]`);
 
@@ -48,6 +49,38 @@ export default function Navbar() {
     updateIndicator(active);
   }, [active, menuOpen]);
 
+  // 🔥 INTERSECTION OBSERVER
+  useEffect(() => {
+    const sections = links.map((l) => document.getElementById(l.id));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            setActive(id);
+
+            // цвет navbar
+            if (id === 'about' || id === 'clients') {
+              setIsLight(true);
+            } else {
+              setIsLight(false);
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.6,
+      }
+    );
+
+    sections.forEach((section) => {
+      if (section) observer.observe(section);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between relative">
@@ -65,12 +98,14 @@ export default function Navbar() {
           className={`
             absolute left-1/2 -translate-x-1/2
             flex items-center gap-6
-            px-5 py-2 rounded-full text-black
+            px-5 py-2 rounded-full
+
+            ${isLight ? 'text-white' : 'text-black'}
 
             bg-black/5
             border border-white/10
             backdrop-blur-2xl
-            text-sm font-medium tracking-wide text-black
+            text-sm font-medium tracking-wide
 
             transition-all duration-500
 
@@ -79,9 +114,9 @@ export default function Navbar() {
               : 'opacity-0 translate-y-4 pointer-events-none'}
           `}
         >
-          {/* MOVING PILL */}
+          {/* INDICATOR */}
           <motion.div
-            className="absolute top-1 bottom-1 rounded-full bg-white/10 backdrop-blur-xl z-0"
+            className="absolute top-1 bottom-1 rounded-full bg-white/10 z-0"
             animate={{
               left: indicator.left,
               width: indicator.width,
@@ -101,12 +136,13 @@ export default function Navbar() {
               className={`
                 relative z-10 px-3 py-1
                 text-[15px] md:text-[16px]
-                tracking-wide
                 transition-all duration-300
 
                 ${active === link.id
-                  ? 'text-black'
-                  : 'text-black/60 hover:text-black'}
+                  ? (isLight ? 'text-white' : 'text-black')
+                  : (isLight
+                      ? 'text-white/60 hover:text-white'
+                      : 'text-black/60 hover:text-black')}
               `}
             >
               {link.name}
@@ -114,14 +150,14 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* HAMBURGER */}
+        {/* BURGER */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className="z-50 p-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md"
         >
-          <div className={`w-5 h-[2px] bg-black mb-1.5 transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-          <div className={`w-5 h-[2px] bg-black mb-1.5 transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
-          <div className={`w-5 h-[2px] bg-black transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+          <div className={`w-5 h-[2px] mb-1.5 transition-all duration-300 ${isLight ? 'bg-white' : 'bg-black'} ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+          <div className={`w-5 h-[2px] mb-1.5 transition-all duration-300 ${isLight ? 'bg-white' : 'bg-black'} ${menuOpen ? 'opacity-0' : ''}`} />
+          <div className={`w-5 h-[2px] transition-all duration-300 ${isLight ? 'bg-white' : 'bg-black'} ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
         </button>
 
       </div>
