@@ -1,132 +1,145 @@
 import { useEffect, useRef, useState } from 'react';
-import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
+import { FiGlobe } from "react-icons/fi";
+import { LuClipboardCheck } from "react-icons/lu";
+import { TbShieldCheck } from "react-icons/tb";
+import { HiOutlineBadgeCheck } from "react-icons/hi";
 
-interface Stat {
-  value: number;
-  suffix: string;
-  label: string;
-}
+const stats = [
+  {
+    value: 5,
+    suffix: '+',
+    icon: <FiGlobe />,
+    title: 'Стран присутствия',
+    description:
+      'Работаем с клиентами на международных рынках, адаптируя решения под локальные требования.',
+  },
+  {
+    value: 20,
+    suffix: '+',
+    icon: <LuClipboardCheck />,
+    title: 'Успешных проектов в год',
+    description:
+      'Сопровождаем регистрацию, документацию и вывод медицинских изделий на рынок.',
+  },
+  {
+    value: 92,
+    suffix: '%',
+    icon: <TbShieldCheck />,
+    title: 'Долгосрочное сотрудничество',
+    description:
+      'Большая часть новых обращений приходит благодаря доверию действующих партнёров.',
+  },
+  {
+    value: 4.9,
+    suffix: '/5',
+    icon: <HiOutlineBadgeCheck />,
+    title: 'Высокая клиентская оценка',
+    description:
+      'Высокая оценка качества работы, точности сроков и профессионального сопровождения.',
+  },
+];
 
-function useCountUp(target: number, active: boolean) {
-  const [value, setValue] = useState(0);
-  const frame = useRef<number | null>(null);
+function CountNumber({ value, active }) {
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
-    if (!active) return;
+    if (!active) {
+      setCount(0);
+      return;
+    }
 
-    let start: number | null = null;
+    let start = null;
+    let animationFrame;
     const duration = 1400;
 
-    const animate = (t: number) => {
-      if (!start) start = t;
+    const animate = (time) => {
+      if (!start) start = time;
 
-      const progress = (t - start) / duration;
-      const current = Math.min(progress * target, target);
+      const progress = Math.min((time - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
 
-      setValue(current);
+      setCount(value * eased);
 
       if (progress < 1) {
-        frame.current = requestAnimationFrame(animate);
+        animationFrame = requestAnimationFrame(animate);
       }
     };
 
-    setValue(0);
-    frame.current = requestAnimationFrame(animate);
+    animationFrame = requestAnimationFrame(animate);
 
-    return () => {
-      if (frame.current) cancelAnimationFrame(frame.current);
-    };
-  }, [active, target]);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [value, active]);
 
-  return Math.floor(value);
+  return value % 1 === 0 ? Math.floor(count) : count.toFixed(1);
 }
 
-function StatCard({
-  stat,
-  active,
-  delay,
-}: {
-  stat: Stat;
-  active: boolean;
-  delay: number;
-}) {
-  const count = useCountUp(stat.value, active);
-
+function StatCard({ item, index, active }) {
   return (
     <div
-      className="text-center opacity-0 animate-fadeUp"
-      style={{
-        animationDelay: `${delay}ms`,
-        animationFillMode: 'forwards',
-      }}
+      className={`stat-card ${active ? 'show' : ''}`}
+      style={{ transitionDelay: active ? `${index * 120}ms` : '0ms' }}
     >
-      <div className="text-5xl md:text-6xl font-semibold text-black tracking-tight">
-        {count}
-        <span className="text-gray-400 ml-1">{stat.suffix}</span>
+      <div className="stat-icon">{item.icon}</div>
+
+      <div className="stat-number">
+        <CountNumber value={item.value} active={active} />
+        <span>{item.suffix}</span>
       </div>
 
-      <div className="mt-3 text-sm text-gray-500 tracking-wide">
-        {stat.label}
-      </div>
+      <h3>{item.title}</h3>
+      <p>{item.description}</p>
     </div>
   );
 }
 
 export default function Stats() {
-  const { ref, isVisible } = useIntersectionObserver(0.35);
+  const sectionRef = useRef(null);
   const [active, setActive] = useState(false);
 
-  const stats: Stat[] = [
-    { value: 5, suffix: '+', label: 'Клиенты в разных странах' },
-    { value: 20, suffix: '+', label: 'Успешных проектов за год' },
-    { value: 92, suffix: '%', label: 'Клиенты по рекомендации' },
-    { value: 4, suffix: '.9/5', label: 'Отзывы от покупателей' },
-  ];
-
-  // 🔥 RESET LOGIC (ВАЖНО — теперь правильно)
   useEffect(() => {
-    if (isVisible) {
-      setActive(false);
-      const t = setTimeout(() => setActive(true), 80); // restart animation
-      return () => clearTimeout(t);
-    } else {
-      setActive(false);
-    }
-  }, [isVisible]);
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setActive(false);
+
+          setTimeout(() => {
+            setActive(true);
+          }, 100);
+        } else {
+          setActive(false);
+        }
+      },
+      { threshold: 0.25 }
+    );
+
+    observer.observe(section);
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section
-      ref={ref as any}
-      className="relative py-32 bg-white overflow-hidden"
-    >
-      {/* soft premium glow */}
-      <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-100/30 blur-[120px] rounded-full" />
+    <section ref={sectionRef} className="stats-section">
+      <div className="stats-bg" />
 
-      <div className="max-w-6xl mx-auto px-6">
-
-        {/* TITLE */}
-        <div className="text-center mb-20">
-          <p className="text-xl tracking-[0.35em] uppercase text-gray-400 mb-4">
-            Результаты
-          </p>
-
-          <h2 className="text-4xl md:text-5xl font-bold text-black">
-            Цифры говорят сами
-          </h2>
+      <div className="stats-container">
+        <div className={`stats-title ${active ? 'show' : ''}`}>
+          <span>«РЕЗУЛЬТАТЫ»</span>
+          <h2>Цифры, которые подтверждают опыт</h2>
         </div>
 
-        {/* GRID */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-16 justify-items-center">
-          {stats.map((s, i) => (
+        <div className="stats-grid">
+          {stats.map((item, index) => (
             <StatCard
-              key={s.label + active}
-              stat={s}
+              key={item.title}
+              item={item}
+              index={index}
               active={active}
-              delay={i * 120}
             />
           ))}
         </div>
-
       </div>
     </section>
   );
